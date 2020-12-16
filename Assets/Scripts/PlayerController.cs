@@ -16,13 +16,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 10f)]
     float jumpHeight = 2f;
 
-    Vector3 velocity, desiredVelocity;
+    [SerializeField, Range(0, 5)]
+    int maxAirJumps = 0;
 
+    Vector3 velocity;
+    Vector3 desiredVelocity;
     Rigidbody body;
-
     bool desiredJump;
     bool onGround;
-    
+    int jumpPhase;
 
     private void Awake()
     {
@@ -62,15 +64,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        velocity = body.velocity;
+        UpdateState();        
 
         if (desiredJump)
         {
             desiredJump = false;
-            if (onGround)
-            {
-                Jump();
-            }            
+            Jump(); 
         }        
         float maxSpeedChange = maxAcceleration * Time.deltaTime;
         velocity.x =
@@ -82,8 +81,21 @@ public class PlayerController : MonoBehaviour
         body.velocity = velocity;
     }
 
+    private void UpdateState()
+    {
+        velocity = body.velocity;
+        if (onGround)
+        {
+            jumpPhase = 0;
+        }
+    }
+
     private void Jump()
     {
-        velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+        if(onGround || jumpPhase < maxAirJumps)
+        {
+            jumpPhase++;
+            velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+        }        
     }
 }
