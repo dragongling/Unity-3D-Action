@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    const float groundNormalLimit = 0.9f;
+
     [SerializeField, Range(0f, 100f)]
     float maxSpeed = 10f;
 
@@ -39,14 +41,23 @@ public class PlayerController : MonoBehaviour
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;        
     }
 
-    void OnCollisionEnter()
+    void OnCollisionEnter(Collision collision)
     {
-        onGround = true;
+        EvaluateCollision(collision);
+    }    
+
+    void OnCollisionStay(Collision collision)
+    {
+        EvaluateCollision(collision);
     }
 
-    void OnCollisionStay()
+    private void EvaluateCollision(Collision collision)
     {
-        onGround = true;
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            Vector3 normal = collision.GetContact(i).normal;
+            onGround |= normal.y >= groundNormalLimit;
+        }
     }
 
     private void FixedUpdate()
