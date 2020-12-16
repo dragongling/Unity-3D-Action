@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     Rigidbody body;
 
     bool desiredJump;
+    bool onGround;
     
 
     private void Awake()
@@ -38,6 +39,16 @@ public class PlayerController : MonoBehaviour
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;        
     }
 
+    void OnCollisionEnter()
+    {
+        onGround = true;
+    }
+
+    void OnCollisionStay()
+    {
+        onGround = true;
+    }
+
     private void FixedUpdate()
     {
         velocity = body.velocity;
@@ -45,7 +56,10 @@ public class PlayerController : MonoBehaviour
         if (desiredJump)
         {
             desiredJump = false;
-            Jump();
+            if (onGround)
+            {
+                Jump();
+            }            
         }        
         float maxSpeedChange = maxAcceleration * Time.deltaTime;
         velocity.x =
@@ -53,12 +67,12 @@ public class PlayerController : MonoBehaviour
         velocity.z =
             Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
 
+        onGround = false;
         body.velocity = velocity;
     }
 
     private void Jump()
     {
-        Debug.Log("Jump desired!");
         velocity.y += Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
     }
 }
