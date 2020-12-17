@@ -11,6 +11,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 100f)]
     float maxAcceleration = 10f;
 
+    [SerializeField, Range(0f, 100f)]
+    float maxAirAcceleration = 10f;
+
     [SerializeField, Range(0f, 10f)]
     float jumpHeight = 2f;
 
@@ -76,18 +79,14 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        UpdateState();        
+        UpdateState();
+        AdjustVelocity();
 
         if (desiredJump)
         {
             desiredJump = false;
             Jump(); 
-        }        
-        float maxSpeedChange = maxAcceleration * Time.deltaTime;
-        velocity.x =
-            Mathf.MoveTowards(velocity.x, desiredVelocity.x, maxSpeedChange);
-        velocity.z =
-            Mathf.MoveTowards(velocity.z, desiredVelocity.z, maxSpeedChange);
+        }
 
         onGround = false;
         body.velocity = velocity;
@@ -119,5 +118,29 @@ public class PlayerController : MonoBehaviour
             }
             velocity += contactNormal * jumpSpeed;
         }        
+    }
+
+    void AdjustVelocity()
+    {
+        Vector3 xAxis = ProjectOnContactPlane(Vector3.right).normalized;
+        Vector3 zAxis = ProjectOnContactPlane(Vector3.forward).normalized;
+
+        float currentX = Vector3.Dot(velocity, xAxis);
+        float currentZ = Vector3.Dot(velocity, zAxis);
+
+        float acceleration = onGround ? maxAcceleration : maxAirAcceleration;
+        float maxSpeedChange = acceleration * Time.deltaTime;
+
+        float newX =
+            Mathf.MoveTowards(currentX, desiredVelocity.x, maxSpeedChange);
+        float newZ =
+            Mathf.MoveTowards(currentZ, desiredVelocity.z, maxSpeedChange);
+
+        velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+    }
+
+    Vector3 ProjectOnContactPlane(Vector3 vector)
+    {
+        return vector - contactNormal * Vector3.Dot(vector, contactNormal);
     }
 }
