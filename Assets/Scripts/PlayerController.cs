@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    const float groundNormalLimit = 0.9f;
-
     [SerializeField, Range(0f, 100f)]
     float maxSpeed = 10f;
 
@@ -19,16 +17,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0, 5)]
     int maxAirJumps = 0;
 
+    [SerializeField, Range(0f, 90f)]
+    float maxGroundAngle = 25f;
+
     Vector3 velocity;
     Vector3 desiredVelocity;
     Rigidbody body;
     bool desiredJump;
     bool onGround;
     int jumpPhase;
+    float minGroundDotProduct;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        OnValidate();
     }
 
     void Update()
@@ -38,9 +41,13 @@ public class PlayerController : MonoBehaviour
         playerInput.y = Input.GetAxis("Vertical");
         desiredJump |= Input.GetButtonDown("Jump");            
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
-
         
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;        
+    }
+
+    void OnValidate()
+    {
+        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
     }
 
     void OnCollisionEnter(Collision collision)
@@ -58,7 +65,7 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector3 normal = collision.GetContact(i).normal;
-            onGround |= normal.y >= groundNormalLimit;
+            onGround |= normal.y >= minGroundDotProduct;
         }
     }
 
