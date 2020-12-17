@@ -30,7 +30,9 @@ public class PlayerController : MonoBehaviour
     float minGroundDotProduct;
     int jumpPhase;
     bool desiredJump;
-    bool onGround;
+    int groundContactCount;
+
+    bool OnGround => groundContactCount > 0;
 
     private void Awake()
     {
@@ -46,7 +48,11 @@ public class PlayerController : MonoBehaviour
         desiredJump |= Input.GetButtonDown("Jump");            
         playerInput = Vector2.ClampMagnitude(playerInput, 1f);
         
-        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;        
+        desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+
+        GetComponent<Renderer>().material.SetColor(
+            "_Color", Color.white * (groundContactCount * 0.25f)
+        );
     }
 
     void OnValidate()
@@ -71,7 +77,7 @@ public class PlayerController : MonoBehaviour
             Vector3 normal = collision.GetContact(i).normal;
             if (normal.y >= minGroundDotProduct)
             {
-                onGround = true;
+                groundContactCount++;
                 contactNormal += normal;
             }
         }
@@ -89,21 +95,25 @@ public class PlayerController : MonoBehaviour
         }
 
         body.velocity = velocity;
+        ClearState();
     }
 
     void ClearState()
     {
-        onGround = false;
+        groundContactCount = 0;
         contactNormal = Vector3.zero;
     }
 
     private void UpdateState()
     {
         velocity = body.velocity;
-        if (onGround)
+        if (OnGround)
         {
             jumpPhase = 0;
-            contactNormal.Normalize();
+            if (groundContactCount > 1)
+            {
+                contactNormal.Normalize();
+            }
         }
         else
         {
@@ -113,7 +123,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if(onGround || jumpPhase < maxAirJumps)
+        if(OnGround || jumpPhase < maxAirJumps)
         {
             jumpPhase++;
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
@@ -134,7 +144,7 @@ public class PlayerController : MonoBehaviour
         float currentX = Vector3.Dot(velocity, xAxis);
         float currentZ = Vector3.Dot(velocity, zAxis);
 
-        float acceleration = onGround ? maxAcceleration : maxAirAcceleration;
+        float acceleration = OnGround ? maxAcceleration : maxAirAcceleration;
         float maxSpeedChange = acceleration * Time.deltaTime;
 
         float newX =
