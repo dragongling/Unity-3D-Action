@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour
             if (normal.y >= minGroundDotProduct)
             {
                 onGround = true;
-                contactNormal = normal;
+                contactNormal += normal;
             }
         }
     }
@@ -88,8 +88,13 @@ public class PlayerController : MonoBehaviour
             Jump(); 
         }
 
-        onGround = false;
         body.velocity = velocity;
+    }
+
+    void ClearState()
+    {
+        onGround = false;
+        contactNormal = Vector3.zero;
     }
 
     private void UpdateState()
@@ -98,6 +103,7 @@ public class PlayerController : MonoBehaviour
         if (onGround)
         {
             jumpPhase = 0;
+            contactNormal.Normalize();
         }
         else
         {

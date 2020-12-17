@@ -2707,7 +2707,7 @@ MonoBehaviour:
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
-  m_SelectedVertices: 20010000
+  m_SelectedVertices: 
 --- !u!4 &1087379690
 Transform:
   m_ObjectHideFlags: 0
@@ -2951,6 +2951,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Sphere
+      objectReference: {fileID: 0}
+    - target: {fileID: 1370559235352274877, guid: 6ecb15a1147d01942bf03706efee0b08,
+        type: 3}
+      propertyPath: maxSpeed
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ecb15a1147d01942bf03706efee0b08, type: 3}
