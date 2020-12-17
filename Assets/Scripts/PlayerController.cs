@@ -20,13 +20,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 90f)]
     float maxGroundAngle = 25f;
 
+    Rigidbody body;
     Vector3 velocity;
     Vector3 desiredVelocity;
-    Rigidbody body;
+    Vector3 contactNormal;
+    float minGroundDotProduct;
+    int jumpPhase;
     bool desiredJump;
     bool onGround;
-    int jumpPhase;
-    float minGroundDotProduct;
 
     private void Awake()
     {
@@ -65,7 +66,11 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < collision.contactCount; i++)
         {
             Vector3 normal = collision.GetContact(i).normal;
-            onGround |= normal.y >= minGroundDotProduct;
+            if (normal.y >= minGroundDotProduct)
+            {
+                onGround = true;
+                contactNormal = normal;
+            }
         }
     }
 
@@ -95,6 +100,10 @@ public class PlayerController : MonoBehaviour
         {
             jumpPhase = 0;
         }
+        else
+        {
+            contactNormal = Vector3.up;
+        }
     }
 
     private void Jump()
@@ -103,11 +112,12 @@ public class PlayerController : MonoBehaviour
         {
             jumpPhase++;
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
-            if (velocity.y > 0f)
+            float alignedSpeed = Vector3.Dot(velocity, contactNormal);
+            if (alignedSpeed > 0f)
             {
-                jumpSpeed = Mathf.Max(jumpSpeed - velocity.y, 0f);
+                jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
             }
-            velocity.y += jumpSpeed;
+            velocity += contactNormal * jumpSpeed;
         }        
     }
 }
