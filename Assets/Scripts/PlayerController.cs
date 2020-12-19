@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     bool desiredJump;
     int groundContactCount;
     int stepsSinceLastGrounded;
+    int stepsSinceLastJump;
 
     bool OnGround => groundContactCount > 0;
 
@@ -111,6 +112,7 @@ public class PlayerController : MonoBehaviour
     private void UpdateState()
     {
         stepsSinceLastGrounded++;
+        stepsSinceLastJump++;
         velocity = body.velocity;
         if (OnGround || SnapToGround())
         {
@@ -137,6 +139,7 @@ public class PlayerController : MonoBehaviour
     {
         if(OnGround || jumpPhase < maxAirJumps)
         {
+            stepsSinceLastJump = 0;
             jumpPhase++;
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
             float alignedSpeed = Vector3.Dot(velocity, contactNormal);
@@ -174,7 +177,7 @@ public class PlayerController : MonoBehaviour
 
     bool SnapToGround()
     {
-        if (stepsSinceLastGrounded > 1)
+        if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2)
         {
             return false;
         }
