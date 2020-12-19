@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     int jumpPhase;
     bool desiredJump;
     int groundContactCount;
+    int stepsSinceLastGrounded;
 
     bool OnGround => groundContactCount > 0;
 
@@ -51,13 +52,23 @@ public class PlayerController : MonoBehaviour
         desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 
         GetComponent<Renderer>().material.SetColor(
-            "_Color", Color.white * (groundContactCount * 0.25f)
+            "_Color", OnGround ? Color.black : Color.white
         );
     }
 
-    void OnValidate()
+    private void FixedUpdate()
     {
-        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
+        UpdateState();
+        AdjustVelocity();
+
+        if (desiredJump)
+        {
+            desiredJump = false;
+            Jump();
+        }
+
+        body.velocity = velocity;
+        ClearState();
     }
 
     void OnCollisionEnter(Collision collision)
@@ -68,6 +79,11 @@ public class PlayerController : MonoBehaviour
     void OnCollisionStay(Collision collision)
     {
         EvaluateCollision(collision);
+    }
+
+    void OnValidate()
+    {
+        minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
     }
 
     private void EvaluateCollision(Collision collision)
@@ -83,32 +99,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        UpdateState();
-        AdjustVelocity();
-
-        if (desiredJump)
-        {
-            desiredJump = false;
-            Jump(); 
-        }
-
-        body.velocity = velocity;
-        ClearState();
-    }
-
-    void ClearState()
-    {
-        groundContactCount = 0;
-        contactNormal = Vector3.zero;
-    }
-
     private void UpdateState()
     {
+        stepsSinceLastGrounded++;
         velocity = body.velocity;
         if (OnGround)
         {
+            stepsSinceLastGrounded = 0;
             jumpPhase = 0;
             if (groundContactCount > 1)
             {
@@ -121,12 +118,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void ClearState()
+    {
+        groundContactCount = 0;
+        contactNormal = Vector3.zero;
+    }    
+
     private void Jump()
     {
         if(OnGround || jumpPhase < maxAirJumps)
         {
             jumpPhase++;
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
+            jumpSpeed = 10;
             float alignedSpeed = Vector3.Dot(velocity, contactNormal);
             if (alignedSpeed > 0f)
             {
@@ -158,5 +162,31 @@ public class PlayerController : MonoBehaviour
     Vector3 ProjectOnContactPlane(Vector3 vector)
     {
         return vector - contactNormal * Vector3.Dot(vector, contactNormal);
+    }
+
+    bool SnapToGround()
+    {
+        if (stepsSinceLastGrounded > 1)
+        {
+            return false;
+        }
+        if (!Physics.Raycast(body.position, Vector3.down, out RaycastHit hit))
+        {
+            return false;
+        }
+        if (hit.normal.y < minGroundDotProduct)
+        {
+            return false;
+        }
+
+        groundContactCount = 1;
+        contactNormal = hit.normal;
+        float speed = velocity.magnitude;
+        float dot = Vector3.Dot(velocity, hit.normal);
+        if (dot > 0f)
+        {
+            velocity = (velocity - hit.normal * dot).normalized * speed;
+        }
+        return true;
     }
 }
