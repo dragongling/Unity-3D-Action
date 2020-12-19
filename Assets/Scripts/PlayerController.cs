@@ -23,6 +23,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 90f)]
     float maxGroundAngle = 25f;
 
+    [SerializeField, Range(0f, 100f)]
+    float maxSnapSpeed = 100f;
+
+    [SerializeField, Min(0f)]
+    float probeDistance = 1f;
+
     Rigidbody body;
     Vector3 velocity;
     Vector3 desiredVelocity;
@@ -103,7 +109,7 @@ public class PlayerController : MonoBehaviour
     {
         stepsSinceLastGrounded++;
         velocity = body.velocity;
-        if (OnGround)
+        if (OnGround || SnapToGround())
         {
             stepsSinceLastGrounded = 0;
             jumpPhase = 0;
@@ -130,7 +136,6 @@ public class PlayerController : MonoBehaviour
         {
             jumpPhase++;
             float jumpSpeed = Mathf.Sqrt(-2f * Physics.gravity.y * jumpHeight);
-            jumpSpeed = 10;
             float alignedSpeed = Vector3.Dot(velocity, contactNormal);
             if (alignedSpeed > 0f)
             {
@@ -170,7 +175,12 @@ public class PlayerController : MonoBehaviour
         {
             return false;
         }
-        if (!Physics.Raycast(body.position, Vector3.down, out RaycastHit hit))
+        float speed = velocity.magnitude;
+        if (speed > maxSnapSpeed)
+        {
+            return false;
+        }
+        if (!Physics.Raycast(body.position, Vector3.down, out RaycastHit hit, probeDistance))
         {
             return false;
         }
@@ -181,7 +191,6 @@ public class PlayerController : MonoBehaviour
 
         groundContactCount = 1;
         contactNormal = hit.normal;
-        float speed = velocity.magnitude;
         float dot = Vector3.Dot(velocity, hit.normal);
         if (dot > 0f)
         {
