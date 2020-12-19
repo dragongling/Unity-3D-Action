@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)]
     float probeDistance = 1f;
 
+    [SerializeField]
+    LayerMask probeMask = -1;
+
     Rigidbody body;
     Vector3 velocity;
     Vector3 desiredVelocity;
@@ -180,7 +183,7 @@ public class PlayerController : MonoBehaviour
         {
             return false;
         }
-        if (!Physics.Raycast(body.position, Vector3.down, out RaycastHit hit, probeDistance))
+        if (!Physics.Raycast(body.position, Vector3.down, out RaycastHit hit, probeDistance, probeMask))
         {
             return false;
         }
