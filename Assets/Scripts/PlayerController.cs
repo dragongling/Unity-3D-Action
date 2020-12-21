@@ -35,6 +35,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Transform playerInputSpace = default;
 
+    [SerializeField]
+    bool groundCollisionDebug = false;
+
     Rigidbody body;
     Vector3 velocity;
     Vector3 desiredVelocity;
@@ -79,9 +82,12 @@ public class PlayerController : MonoBehaviour
                 new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
         }
 
-        GetComponent<Renderer>().material.SetColor(
-            "_Color", OnGround ? Color.black : Color.white
-        );
+        if (groundCollisionDebug)
+        {
+            GetComponent<Renderer>().material.SetColor(
+                "_Color", OnGround ? Color.black : Color.white
+            );
+        }
     }
 
     private void FixedUpdate()
