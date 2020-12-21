@@ -102,7 +102,13 @@ public class PlayerController : MonoBehaviour
         }
 
         body.velocity = velocity;
+        AdjustRotation();
         ClearState();
+    }
+
+    private void AdjustRotation()
+    {
+        transform.Rotate(body.rotation.eulerAngles);
     }
 
     void OnCollisionEnter(Collision collision)
