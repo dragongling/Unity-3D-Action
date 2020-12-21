@@ -88,6 +88,7 @@ public class OrbitCamera : MonoBehaviour
 			Input.GetAxis("Vertical Camera"),
 			Input.GetAxis("Horizontal Camera")
 		);
+		input.x = -input.x;
 		const float e = 0.001f;
 		if (input.x < -e || input.x > e || input.y < -e || input.y > e)
 		{
