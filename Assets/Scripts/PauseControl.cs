@@ -9,7 +9,7 @@ public class PauseControl : MonoBehaviour
 
     private void Awake()
     {
-        menu.SetActive(gameIsPaused);
+        Resume();
     }
 
     // Update is called once per frame
@@ -27,12 +27,14 @@ public class PauseControl : MonoBehaviour
 
     private void Pause()
     {
+        Cursor.visible = true;
         Time.timeScale = 0f;
         menu.SetActive(gameIsPaused);
     }
 
     private void Resume()
     {
+        Cursor.visible = false;
         Time.timeScale = 1;
         menu.SetActive(gameIsPaused);
     }
