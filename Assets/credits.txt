@@ -1,3 +1,0 @@
-Thanks to
-[CatLikeCoding](https://catlikecoding.com) for great tutorials
-[Chadrik Evans](https://forum.unity.com/members/chadrickevans.795411/) for good camera collision script
