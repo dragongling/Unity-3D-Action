@@ -96,6 +96,8 @@ public class OrbitCamera : MonoBehaviour
 
 	bool ManualRotation()
 	{
+		if (PauseControl.gameIsPaused)
+			return false;
 		Vector2 input = new Vector2(
 			Input.GetAxis("Vertical Camera"),
 			Input.GetAxis("Horizontal Camera")

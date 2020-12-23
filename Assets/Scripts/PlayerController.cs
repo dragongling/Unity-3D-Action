@@ -59,34 +59,37 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Vector2 playerInput;
-        playerInput.x = Input.GetAxis("Horizontal");
-        playerInput.y = Input.GetAxis("Vertical");
-        desiredJump |= Input.GetButtonDown("Jump");            
-        playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+        if (!PauseControl.gameIsPaused)
+        {
+            Vector2 playerInput;
+            playerInput.x = Input.GetAxis("Horizontal");
+            playerInput.y = Input.GetAxis("Vertical");
+            desiredJump |= Input.GetButtonDown("Jump");
+            playerInput = Vector2.ClampMagnitude(playerInput, 1f);
 
-        if (playerInputSpace)
-        {
-            Vector3 forward = playerInputSpace.forward;
-            forward.y = 0f;
-            forward.Normalize();
-            Vector3 right = playerInputSpace.right;
-            right.y = 0f;
-            right.Normalize();
-            desiredVelocity =
-                (forward * playerInput.y + right * playerInput.x) * maxSpeed;
-        }
-        else
-        {
-            desiredVelocity =
-                new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
-        }
+            if (playerInputSpace)
+            {
+                Vector3 forward = playerInputSpace.forward;
+                forward.y = 0f;
+                forward.Normalize();
+                Vector3 right = playerInputSpace.right;
+                right.y = 0f;
+                right.Normalize();
+                desiredVelocity =
+                    (forward * playerInput.y + right * playerInput.x) * maxSpeed;
+            }
+            else
+            {
+                desiredVelocity =
+                    new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
+            }
 
-        if (groundCollisionDebug)
-        {
-            GetComponent<Renderer>().material.SetColor(
-                "_Color", OnGround ? Color.black : Color.white
-            );
+            if (groundCollisionDebug)
+            {
+                GetComponent<Renderer>().material.SetColor(
+                    "_Color", OnGround ? Color.black : Color.white
+                );
+            }
         }
     }
 
