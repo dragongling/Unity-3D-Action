@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PauseControl : MonoBehaviour
 {
-    public GameObject menu; // Assign in inspector
+    public Canvas pauseMenu;
     public static bool gameIsPaused = false;
 
     private void Awake()
@@ -29,14 +29,16 @@ public class PauseControl : MonoBehaviour
     {
         Cursor.visible = true;
         Time.timeScale = 0f;
-        menu.SetActive(gameIsPaused);
+        pauseMenu.enabled = gameIsPaused;
+        //pauseMenu.SetActive(gameIsPaused);
     }
 
     private void Resume()
     {
         Cursor.visible = false;
         Time.timeScale = 1;
-        menu.SetActive(gameIsPaused);
+        pauseMenu.enabled = gameIsPaused;
+        //pauseMenu.SetActive(gameIsPaused);
     }
 
     public void ExitToDesktop()
