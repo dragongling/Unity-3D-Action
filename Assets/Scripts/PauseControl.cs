@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseControl : MonoBehaviour
 {
     public Canvas pauseMenu;
-    public static bool gameIsPaused = false;
+    public static bool gameIsPaused;
 
-    private void Awake()
+    private void Start()
     {
+        gameIsPaused = false;
         Resume();
     }
 
@@ -30,7 +32,6 @@ public class PauseControl : MonoBehaviour
         Cursor.visible = true;
         Time.timeScale = 0f;
         pauseMenu.enabled = gameIsPaused;
-        //pauseMenu.SetActive(gameIsPaused);
     }
 
     private void Resume()
@@ -38,15 +39,15 @@ public class PauseControl : MonoBehaviour
         Cursor.visible = false;
         Time.timeScale = 1;
         pauseMenu.enabled = gameIsPaused;
-        //pauseMenu.SetActive(gameIsPaused);
     }
 
-    public void ExitToDesktop()
+    public void QuitGame()
     {
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            Application.Quit();
-        #endif
+        GameManager.QuitGame();
+    }
+
+    public void QuitToMainMenu()
+    {
+        SceneManager.LoadScene("Main Screen");
     }
 }
