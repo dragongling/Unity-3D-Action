@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     Vector3 velocity;
     Vector3 desiredVelocity;
     Vector3 contactNormal;
+    Vector3 spawnPosition;
     float minGroundDotProduct;
     int jumpPhase;
     bool desiredJump;
@@ -55,6 +56,11 @@ public class PlayerController : MonoBehaviour
     {
         body = GetComponent<Rigidbody>();
         OnValidate();
+    }
+
+    private void Start()
+    {
+        spawnPosition = transform.position;
     }
 
     void Update()
@@ -236,5 +242,10 @@ public class PlayerController : MonoBehaviour
             velocity = (velocity - hit.normal * dot).normalized * speed;
         }
         return true;
+    }
+
+    void Respawn()
+    {
+        transform.position = spawnPosition;
     }
 }
