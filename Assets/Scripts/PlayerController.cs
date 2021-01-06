@@ -39,10 +39,12 @@ public class PlayerController : MonoBehaviour
     bool groundCollisionDebug = false;
 
     Rigidbody body;
+    Respawnable respawnable;
+
     Vector3 velocity;
     Vector3 desiredVelocity;
     Vector3 contactNormal;
-    Vector3 spawnPosition;
+
     float minGroundDotProduct;
     int jumpPhase;
     bool desiredJump;
@@ -55,12 +57,8 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody>();
+        respawnable = GetComponent<Respawnable>();
         OnValidate();
-    }
-
-    private void Start()
-    {
-        spawnPosition = transform.position;
     }
 
     void Update()
@@ -68,9 +66,9 @@ public class PlayerController : MonoBehaviour
         if (!PauseControl.gameIsPaused)
         {
             Vector2 playerInput;
-            if (Input.GetButtonDown("Respawn"))
+            if (Input.GetButtonDown("Respawn") && respawnable != null)
             {
-                Respawn();
+                respawnable.Respawn();
             }
             playerInput.x = Input.GetAxis("Horizontal");
             playerInput.y = Input.GetAxis("Vertical");
@@ -246,11 +244,5 @@ public class PlayerController : MonoBehaviour
             velocity = (velocity - hit.normal * dot).normalized * speed;
         }
         return true;
-    }
-
-    void Respawn()
-    {
-        transform.position = spawnPosition;
-        body.velocity = Vector3.zero;
     }
 }
