@@ -68,6 +68,10 @@ public class PlayerController : MonoBehaviour
         if (!PauseControl.gameIsPaused)
         {
             Vector2 playerInput;
+            if (Input.GetButtonDown("Respawn"))
+            {
+                Respawn();
+            }
             playerInput.x = Input.GetAxis("Horizontal");
             playerInput.y = Input.GetAxis("Vertical");
             desiredJump |= Input.GetButtonDown("Jump");
@@ -247,5 +251,6 @@ public class PlayerController : MonoBehaviour
     void Respawn()
     {
         transform.position = spawnPosition;
+        body.velocity = Vector3.zero;
     }
 }
