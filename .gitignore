@@ -49,3 +49,6 @@ crashlytics-build.properties
 
 # Github plugin
 Github/
+
+# Unity 3rd party Assets
+Assets/TextMesh Pro
