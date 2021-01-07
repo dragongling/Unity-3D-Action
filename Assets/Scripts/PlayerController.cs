@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Respawnable))]
+[RequireComponent(typeof(Killable))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField, Range(0f, 100f)]
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody body;
     Respawnable respawnable;
+    Killable destroyable;
 
     Vector3 velocity;
     Vector3 desiredVelocity;
@@ -58,6 +61,8 @@ public class PlayerController : MonoBehaviour
     {
         body = GetComponent<Rigidbody>();
         respawnable = GetComponent<Respawnable>();
+        destroyable = GetComponent<Killable>();
+        destroyable.OnDeath += OnDeath;
         OnValidate();
     }
 
@@ -66,7 +71,7 @@ public class PlayerController : MonoBehaviour
         if (!PauseControl.gameIsPaused)
         {
             Vector2 playerInput;
-            if (Input.GetButtonDown("Respawn") && respawnable != null)
+            if (Input.GetButtonDown("Respawn"))
             {
                 respawnable.Respawn();
             }
@@ -244,5 +249,10 @@ public class PlayerController : MonoBehaviour
             velocity = (velocity - hit.normal * dot).normalized * speed;
         }
         return true;
+    }
+
+    private void OnDeath(object sender, EventArgs e)
+    {
+        respawnable.Respawn();
     }
 }

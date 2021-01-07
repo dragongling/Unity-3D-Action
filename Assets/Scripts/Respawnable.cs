@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Can <a href="https://tvtropes.org/pmwiki/pmwiki.php/Main/RespawnPoint">Respawn</a>
+/// </summary>
 public class Respawnable : MonoBehaviour
 {
     Vector3 spawnPosition;
-    public float fallLevelY = -15f;
 
     void Start()
     {
         spawnPosition = transform.position;
-    }
-
-    private void Update()
-    {
-        if (transform.position.y <= fallLevelY)
-            Respawn();
     }
 
     public void Respawn()
